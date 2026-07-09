@@ -1,15 +1,51 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
+
 <head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>UVShield Dashboard</title>
+
+    <link rel="stylesheet" href="style.css">
+
 </head>
+
 <body>
 
-<h1>UVShield Dashboard</h1>
+    <div class="container">
 
-<h2 id="uv">Cargando...</h2>
+        <div class="card">
 
-<script src="app.js"></script>
+            <h1>☀ UVShield</h1>
+
+            <p class="subtitle">
+                Sistema Inteligente de Monitoreo de Radiación Ultravioleta
+            </p>
+
+            <div class="uv-card">
+
+                <p>Índice UV Actual</p>
+
+                <h2 id="uv">Cargando...</h2>
+
+            </div>
+
+            <div class="status">
+
+                <span id="estado">
+                    Esperando datos...
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="app.js"></script>
 
 </body>
+
 </html>

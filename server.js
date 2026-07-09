@@ -1,6 +1,74 @@
 const sqlite3 = require('sqlite3').verbose();
+const axios = require('axios');
 
 const db = new sqlite3.Database('./database.db');
+const TELEGRAM_TOKEN = "8208721144:AAEug0fTJ11fXdb-GFFvzTSX1b7Qn6Vujoo";
+const TELEGRAM_CHAT_ID = "-1004354445309";
+
+let ultimaAlerta = false;
+
+async function enviarTelegram(uv){
+
+    let riesgo = "";
+
+    if(uv <= 2){
+        riesgo = "🟢 Bajo";
+    }
+    else if(uv <=5){
+        riesgo = "🟡 Moderado";
+    }
+    else if(uv <=7){
+        riesgo = "🟠 Alto";
+    }
+    else if(uv <=10){
+        riesgo = "🔴 Muy Alto";
+    }
+    else{
+        riesgo = "🟣 Extremo";
+    }
+
+    const mensaje =
+`⚠ *UVShield - Alerta de Radiación UV*
+
+☀ Índice UV: *${uv}*
+
+Nivel de Riesgo:
+${riesgo}
+
+Se recomienda:
+
+✅ Usar protector solar
+🧢 Utilizar gorra o sombrero
+😎 Usar gafas con protección UV
+🌳 Evitar exposición prolongada al sol`;
+
+    try{
+
+        await axios.post(
+            `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`,
+            {
+                chat_id: TELEGRAM_CHAT_ID,
+                text: mensaje,
+                parse_mode: "Markdown"
+            }
+        );
+
+        console.log("Alerta enviada a Telegram");
+
+    }
+    catch(error){
+
+        console.log("Error Telegram:");
+
+        if(error.response){
+            console.log(error.response.data);
+        }else{
+            console.log(error.message);
+        }
+
+    }
+
+}
 
 db.serialize(() => {
     db.run(`
@@ -11,6 +79,7 @@ db.serialize(() => {
         )
     `);
 });
+
 
 
 const mqtt = require('mqtt');
@@ -34,8 +103,29 @@ mqttClient.on('message', (topic, message) => {
     );
 
     console.log(`UV recibido: ${uv}`);
-});
 
+    //=========================
+    // ALERTA TELEGRAM
+    //=========================
+
+    if(uv >= 0){
+
+        if(!ultimaAlerta){
+
+            enviarTelegram(uv);
+
+            ultimaAlerta = true;
+
+        }
+
+    }
+    else{
+
+        ultimaAlerta = false;
+
+    }
+
+});
 
 const express = require('express');
 const cors = require('cors');
@@ -59,3 +149,6 @@ app.get('/api/uv', (req, res) => {
 app.listen(3000, () => {
     console.log("Servidor iniciado");
 });
+
+
+
