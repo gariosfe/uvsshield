@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Sun, 
   Shield, 
@@ -7,8 +7,6 @@ import {
   Clock, 
   TrendingUp, 
   Activity, 
-  Smartphone, 
-  Send, 
   Database, 
   Cpu, 
   Layers, 
@@ -18,7 +16,6 @@ import {
   CheckCircle2, 
   ExternalLink,
   AlertTriangle,
-  Users,
   Umbrella,
   Server
 } from 'lucide-react';
@@ -94,21 +91,8 @@ function App() {
   const [isOnline, setIsOnline] = useState(false);
   const [lastUpdate, setLastUpdate] = useState(null);
 
-  // Estado para el simulador de Telegram
-  const [simUv, setSimUv] = useState(5.8);
-  const [messages, setMessages] = useState([
-    {
-      id: 1,
-      text: "⚠ *UVShield - Alerta de Radiación UV*\n\n☀ Índice UV: *5.8*\n\nNivel de Riesgo:\n🟡 Moderado\n\nSe recomienda:\n✅ Usar protector solar\n🧢 Utilizar gorra o sombrero\n😎 Usar gafas con protección UV\n🌳 Evitar exposición prolongada al sol",
-      time: "18:25"
-    }
-  ]);
-
   // Estado para el diagrama de arquitectura interactivo
   const [activeStep, setActiveStep] = useState(0);
-
-  // Referencia para scroll automático en el simulador de chat
-  const chatEndRef = useRef(null);
 
   // Pasos del diagrama de arquitectura
   const steps = [
@@ -150,13 +134,6 @@ function App() {
     }
   ];
 
-  // Efecto para hacer scroll al final del chat de Telegram
-  useEffect(() => {
-    if (chatEndRef.current) {
-      chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [messages]);
-
   // Efecto para consultar la API de UV del backend
   useEffect(() => {
     const fetchUv = async () => {
@@ -181,27 +158,6 @@ function App() {
     const interval = setInterval(fetchUv, 3000); // Actualiza cada 3 segundos
     return () => clearInterval(interval);
   }, []);
-
-  const handleSliderChange = (e) => {
-    setSimUv(parseFloat(e.target.value));
-  };
-
-  const sendSimulatedTelegramAlert = () => {
-    let riesgo = "";
-    if (simUv <= 2) riesgo = "🟢 Bajo";
-    else if (simUv <= 5) riesgo = "🟡 Moderado";
-    else if (simUv <= 7) riesgo = "🟠 Alto";
-    else if (simUv <= 10) riesgo = "🔴 Muy Alto";
-    else riesgo = "🟣 Extremo";
-
-    const nuevoMensaje = {
-      id: Date.now(),
-      text: `⚠ *UVShield - Alerta de Radiación UV*\n\n☀ Índice UV: *${simUv.toFixed(1)}*\n\nNivel de Riesgo:\n${riesgo}\n\nSe recomienda:\n✅ Usar protector solar\n🧢 Utilizar gorra o sombrero\n😎 Usar gafas con protección UV\n🌳 Evitar exposición prolongada al sol`,
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    };
-
-    setMessages(prev => [...prev, nuevoMensaje]);
-  };
 
   const currentDetails = getUvDetails(liveUv || 3.2); // Fallback en caso de desconexión
   const strokeDashoffset = 515.22 - (515.22 * Math.min(liveUv || 3.2, 15)) / 15;
@@ -230,10 +186,8 @@ function App() {
           <nav className="nav-links">
             <a href="#problema" className="nav-link">El Problema</a>
             <a href="#live-data" className="nav-link">Lectura en Vivo</a>
-            <a href="#simulator" className="nav-link">Simulador Bot</a>
             <a href="#features" className="nav-link">Componentes</a>
             <a href="#architecture" className="nav-link">Arquitectura</a>
-            <a href="#equipo" className="nav-link">Equipo</a>
           </nav>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
@@ -387,83 +341,6 @@ function App() {
               </div>
 
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Interactive Telegram Simulator Section */}
-      <section className="telegram-section" id="simulator">
-        <div className="container">
-          <div className="telegram-grid">
-            
-            {/* Lado de información y controles */}
-            <div className="tg-info-side">
-              <h2>Alertas al Instante en tu Teléfono</h2>
-              <p>
-                UVShield se integra con Telegram para enviar notificaciones push en tiempo real en cuanto los niveles de radiación solar sobrepasan los límites recomendados. ¡Sin necesidad de revisar la web todo el tiempo!
-              </p>
-              
-              <div className="simulator-controls">
-                <div className="sim-slider-label">
-                  <span>Simular Nivel UV</span>
-                  <span style={{ color: 'var(--color-primary)' }}>{simUv.toFixed(1)} UV</span>
-                </div>
-                <input 
-                  type="range" 
-                  min="0" 
-                  max="15" 
-                  step="0.1" 
-                  value={simUv} 
-                  onChange={handleSliderChange} 
-                  className="sim-slider"
-                />
-                <button className="btn btn-primary" onClick={sendSimulatedTelegramAlert} style={{ width: '100%', justifyContent: 'center' }}>
-                  Enviar Alerta a Telegram <Send size={18} />
-                </button>
-              </div>
-            </div>
-
-            {/* Teléfono Animado */}
-            <div>
-              <div className="phone-mockup">
-                <div className="phone-header">
-                  <div className="phone-camera"></div>
-                </div>
-                
-                <div className="phone-screen">
-                  {/* Telegram header */}
-                  <div className="tg-app-bar">
-                    <div className="tg-avatar">UV</div>
-                    <div className="tg-chat-info">
-                      <h4>UVShield Alert Bot</h4>
-                      <span>bot en línea</span>
-                    </div>
-                  </div>
-
-                  {/* Mensajes del chat */}
-                  <div className="tg-chat-messages">
-                    {messages.map((msg) => (
-                      <div key={msg.id} className="tg-message">
-                        {msg.text}
-                        <div style={{ textAlign: 'right', fontSize: '0.6rem', color: '#6e7e8e', marginTop: '0.25rem' }}>
-                          {msg.time}
-                        </div>
-                      </div>
-                    ))}
-                    <div ref={chatEndRef} />
-                  </div>
-
-                  {/* Input bar ficticia */}
-                  <div className="tg-input-bar">
-                    <div className="tg-input-field">Escribe un mensaje...</div>
-                    <div className="btn-icon" style={{ width: '30px', height: '30px', borderRadius: '50%', background: '#24303f', borderColor: 'transparent' }}>
-                      <Send size={12} className="text-white" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
           </div>
         </div>
       </section>
@@ -656,85 +533,6 @@ function App() {
         </div>
       </section>
 
-      {/* 4. Integrantes del Equipo */}
-      <section id="equipo" className="container" style={{ padding: '4rem 2rem' }}>
-        <h2 style={{ fontSize: '2rem', fontWeight: '800', textAlign: 'center', marginBottom: '3rem' }}>Equipo de Trabajo</h2>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-          gap: '2rem'
-        }}>
-          {/* Integrante 1 */}
-          <div className="glass-card" style={{ textAlign: 'center', padding: '2rem 1.5rem' }}>
-            <div style={{
-              width: '70px',
-              height: '70px',
-              borderRadius: '50%',
-              backgroundColor: 'rgba(139, 92, 246, 0.1)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              margin: '0 auto 1.25rem',
-              color: '#8b5cf6',
-              border: '1px solid rgba(139, 92, 246, 0.2)'
-            }}><Users size={32} /></div>
-            <h4 style={{ fontSize: '1.15rem', fontWeight: '700', marginBottom: '0.25rem' }}>Integrante 1</h4>
-            <p style={{ color: '#8b5cf6', fontSize: '0.8rem', fontWeight: '600', textTransform: 'uppercase', marginBottom: '1rem', letterSpacing: '0.5px' }}>
-              Infraestructura & Servidor
-            </p>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: '1.5' }}>
-              Encargado de la configuración de Nginx, despliegue en el VPS y emisión de certificados SSL seguros con Certbot.
-            </p>
-          </div>
-
-          {/* Integrante 2 */}
-          <div className="glass-card" style={{ textAlign: 'center', padding: '2rem 1.5rem' }}>
-            <div style={{
-              width: '70px',
-              height: '70px',
-              borderRadius: '50%',
-              backgroundColor: 'rgba(6, 182, 212, 0.1)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              margin: '0 auto 1.25rem',
-              color: '#06b6d4',
-              border: '1px solid rgba(6, 182, 212, 0.2)'
-            }}><Cpu size={32} /></div>
-            <h4 style={{ fontSize: '1.15rem', fontWeight: '700', marginBottom: '0.25rem' }}>Integrante 2</h4>
-            <p style={{ color: '#06b6d4', fontSize: '0.8rem', fontWeight: '600', textTransform: 'uppercase', marginBottom: '1rem', letterSpacing: '0.5px' }}>
-              Hardware & Conectividad
-            </p>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: '1.5' }}>
-              Encargado de la lectura de sensores UV, programación de microcontroladores y protocolo de comunicación MQTT.
-            </p>
-          </div>
-
-          {/* Integrante 3 */}
-          <div className="glass-card" style={{ textAlign: 'center', padding: '2rem 1.5rem' }}>
-            <div style={{
-              width: '70px',
-              height: '70px',
-              borderRadius: '50%',
-              backgroundColor: 'rgba(249, 115, 22, 0.1)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              margin: '0 auto 1.25rem',
-              color: '#f97316',
-              border: '1px solid rgba(249, 115, 22, 0.2)'
-            }}><Layers size={32} /></div>
-            <h4 style={{ fontSize: '1.15rem', fontWeight: '700', marginBottom: '0.25rem' }}>Integrante 3</h4>
-            <p style={{ color: '#f97316', fontSize: '0.8rem', fontWeight: '600', textTransform: 'uppercase', marginBottom: '1rem', letterSpacing: '0.5px' }}>
-              Frontend & Contenido
-            </p>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: '1.5' }}>
-              Diseño de la interfaz de la Landing Page en React, estructuración del dashboard y productor del video de demostración.
-            </p>
-          </div>
-        </div>
-      </section>
-
       {/* Tech Stack Horizontal section */}
       <section className="tech-section">
         <div className="container">
@@ -783,7 +581,7 @@ function App() {
             <div className="footer-links-column">
               <span className="footer-links-title">Proyecto</span>
               <a href="#live-data" className="footer-link">Datos en Vivo</a>
-              <a href="#simulator" className="footer-link">Simulador Bot</a>
+              <a href="#features" className="footer-link">Componentes</a>
               <a href="/dashboard.html" className="footer-link">Dashboard Original</a>
             </div>
 
