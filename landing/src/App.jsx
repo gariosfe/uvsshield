@@ -355,18 +355,18 @@ function App() {
             </p>
           </div>
 
-          <div className="bento-grid" style={{ gridAutoRows: '280px' }}>
+          <div className="bento-grid" style={{ gridAutoRows: '320px' }}>
             
             {/* Tarjeta 1 (Fila 1 - Izquierda - Ancha): MQTT */}
-            <div className="glass-card bento-card bento-cyan bento-card-large">
-              <div className="bento-icon-box">
+            <div className="glass-card bento-card bento-cyan bento-card-large" style={{ padding: '1.5rem' }}>
+              <div className="bento-icon-box" style={{ marginBottom: '1rem' }}>
                 <Wifi size={24} />
               </div>
               <h4 className="bento-title">Protocolo Ligero MQTT</h4>
               <p className="bento-desc">
                 El sensor de radiación publica sus lecturas periódicamente en milisegundos mediante el protocolo de mensajería IoT Mosquitto. Esto garantiza consumo energético mínimo y respuesta instantánea.
               </p>
-              <div className="bento-mqtt-nodes" style={{ maxWidth: '300px', marginTop: '1rem' }}>
+              <div className="bento-mqtt-nodes" style={{ maxWidth: '300px', marginTop: '0.75rem' }}>
                 <div className="mqtt-node">
                   <span>broker_mosquitto:1883</span>
                   <span className="badge">CONECTADO</span>
@@ -379,15 +379,15 @@ function App() {
             </div>
 
             {/* Tarjeta 2 (Fila 1 - Derecha - Angosta): SQLite */}
-            <div className="glass-card bento-card">
-              <div className="bento-icon-box">
+            <div className="glass-card bento-card" style={{ padding: '1.5rem' }}>
+              <div className="bento-icon-box" style={{ marginBottom: '1rem' }}>
                 <Database size={24} />
               </div>
               <h4 className="bento-title">Base de Datos SQLite</h4>
               <p className="bento-desc" style={{ fontSize: '0.85rem' }}>
                 Todas las mediciones se almacenan en una base de datos local SQLite, permitiendo un análisis histórico sin sobrecargar el servidor.
               </p>
-              <div className="bento-db-sim" style={{ position: 'relative', marginTop: '0.75rem', width: '100%' }}>
+              <div className="bento-db-sim" style={{ position: 'absolute', bottom: '1.5rem', left: '1.5rem', right: '1.5rem' }}>
                 <span style={{ color: '#64748b' }}>// Registro</span><br />
                 <span style={{ color: '#10b981' }}>INSERT INTO</span> uv_data(uv_value)<br />
                 <span style={{ color: '#f59e0b' }}>VALUES</span>({(liveUv || 3.2).toFixed(1)});
@@ -395,15 +395,15 @@ function App() {
             </div>
 
             {/* Tarjeta 3 (Fila 2 - Izquierda - Angosta): Charts */}
-            <div className="glass-card bento-card bento-orange">
-              <div className="bento-icon-box">
+            <div className="glass-card bento-card bento-orange" style={{ padding: '1.5rem' }}>
+              <div className="bento-icon-box" style={{ marginBottom: '1rem' }}>
                 <TrendingUp size={24} />
               </div>
               <h4 className="bento-title">Gráficos de Tendencia</h4>
               <p className="bento-desc" style={{ fontSize: '0.85rem' }}>
                 El dashboard interactivo expone gráficas dinámicas de la radiación con escalas cromáticas basadas en la OMS.
               </p>
-              <div className="bento-chart-mini" style={{ position: 'relative', height: '60px', marginTop: '1rem' }}>
+              <div className="bento-chart-mini" style={{ position: 'absolute', bottom: '0', left: '1.5rem', right: '1.5rem', height: '65px' }}>
                 <div className="bento-chart-bar" style={{ height: '35%' }}></div>
                 <div className="bento-chart-bar" style={{ height: '55%' }}></div>
                 <div className="bento-chart-bar" style={{ height: '80%' }}></div>
@@ -415,8 +415,8 @@ function App() {
             </div>
 
             {/* Tarjeta 4 (Fila 2 - Derecha - Ancha): Telegram */}
-            <div className="glass-card bento-card bento-card-large">
-              <div className="bento-icon-box">
+            <div className="glass-card bento-card bento-card-large" style={{ padding: '1.5rem' }}>
+              <div className="bento-icon-box" style={{ marginBottom: '1rem' }}>
                 <Bell size={24} />
               </div>
               <h4 className="bento-title">Notificaciones Inteligentes Telegram</h4>
