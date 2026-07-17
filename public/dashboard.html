@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UVShield Dashboard - Monitoreo Inteligente</title>
+    
+    <!-- Hojas de estilo y Fuentes -->
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Bibliotecas de gráficos e iconos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+
+    <div class="app-container">
+        
+        <!-- Cabecera -->
+        <header class="app-header">
+            <div class="logo-section">
+                <div class="logo-icon">
+                    <i data-lucide="sun"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>UVShield</h1>
+                    <p>Sistema Inteligente de Monitoreo de Radiación Ultravioleta</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <a href="/" class="btn-simulator" style="text-decoration: none; display: inline-flex; align-items: center; gap: 6px; margin-right: 8px;">
+                    <i data-lucide="home"></i> Inicio
+                </a>
+                <span class="status-pill offline" id="connection-status">
+                    <span class="status-dot"></span>
+                    <span class="status-text">OFFLINE</span>
+                </span>
+                <button class="btn-simulator" id="toggle-sim">
+                    <i data-lucide="sliders"></i> Simulación
+                </button>
+            </div>
+        </header>
+
+        <!-- Panel de Simulación (Oculto por defecto) -->
+        <div class="simulator-panel hidden" id="simulator-panel">
+            <div class="sim-header">
+                <h4>Panel de Simulación Interactiva</h4>
+                <p>Usa los controles para simular diferentes niveles de radiación solar y ver cómo responde el sistema.</p>
+            </div>
+            <div class="sim-body">
+                <div class="sim-slider-container">
+                    <input type="range" min="0" max="15" step="0.1" value="0.0" id="sim-slider">
+                    <div class="sim-value-display">
+                        <span id="sim-slider-val">0.0</span> UV
+                    </div>
+                </div>
+                <div class="sim-buttons">
+                    <button class="btn btn-primary" id="btn-sim-send">Agregar Lectura</button>
+                    <button class="btn btn-secondary" id="btn-sim-mode">Activar Modo Demo</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenido principal -->
+        <main class="dashboard-grid">
+            
+            <!-- Columna Izquierda -->
+            <div class="grid-left">
+                
+                <!-- Tarjeta del Medidor Actual -->
+                <div class="glass-card main-gauge-card">
+                    <div class="gauge-container">
+                        <svg width="220" height="220" viewBox="0 0 200 200">
+                            <circle cx="100" cy="100" r="82" class="gauge-bg" />
+                            <circle cx="100" cy="100" r="82" class="gauge-fill" id="gauge-fill" stroke-dasharray="515.22" stroke-dashoffset="515.22" />
+                        </svg>
+                        <div class="gauge-content">
+                            <span class="gauge-label">ÍNDICE UV</span>
+                            <span class="gauge-value" id="uv-value">0.0</span>
+                            <span class="gauge-risk-badge" id="uv-risk-badge">Bajo</span>
+                        </div>
+                    </div>
+                    <div class="risk-info">
+                        <h3 id="uv-status-title">Conectando...</h3>
+                        <p id="uv-status-desc">Espere un momento mientras se recuperan las últimas lecturas.</p>
+                    </div>
+                </div>
+
+                <!-- Tarjeta de Recomendaciones -->
+                <div class="glass-card recommendations-card">
+                    <h2>Recomendaciones de Protección</h2>
+                    <div class="recommendations-grid">
+                        <div class="rec-item" id="rec-fps">
+                            <div class="rec-icon">
+                                <i data-lucide="shield"></i>
+                            </div>
+                            <div class="rec-text">
+                                <h4>Filtro Solar</h4>
+                                <p id="txt-fps">Cargando sugerencia...</p>
+                            </div>
+                        </div>
+                        <div class="rec-item" id="rec-glasses">
+                            <div class="rec-icon">
+                                <i data-lucide="glasses"></i>
+                            </div>
+                            <div class="rec-text">
+                                <h4>Lentes de Sol</h4>
+                                <p id="txt-glasses">Cargando sugerencia...</p>
+                            </div>
+                        </div>
+                        <div class="rec-item" id="rec-hat">
+                            <div class="rec-icon">
+                                <i data-lucide="sparkles"></i>
+                            </div>
+                            <div class="rec-text">
+                                <h4>Gorra / Sombrero</h4>
+                                <p id="txt-hat">Cargando sugerencia...</p>
+                            </div>
+                        </div>
+                        <div class="rec-item" id="rec-shadow">
+                            <div class="rec-icon">
+                                <i data-lucide="umbrella"></i>
+                            </div>
+                            <div class="rec-text">
+                                <h4>Exposición al Sol</h4>
+                                <p id="txt-shadow">Cargando sugerencia...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Columna Derecha -->
+            <div class="grid-right">
+                
+                <!-- Tarjetas de Estadísticas -->
+                <div class="stats-row">
+                    <div class="glass-card stat-card">
+                        <div class="stat-header">
+                            <span>UV MÁXIMO</span>
+                            <i data-lucide="trending-up"></i>
+                        </div>
+                        <span class="stat-value" id="stat-max">0.0</span>
+                        <span class="stat-desc">En las lecturas de hoy</span>
+                    </div>
+                    <div class="glass-card stat-card">
+                        <div class="stat-header">
+                            <span>UV PROMEDIO</span>
+                            <i data-lucide="activity"></i>
+                        </div>
+                        <span class="stat-value" id="stat-avg">0.0</span>
+                        <span class="stat-desc">Promedio ponderado</span>
+                    </div>
+                    <div class="glass-card stat-card">
+                        <div class="stat-header">
+                            <span>TIEMPO SEGURO</span>
+                            <i data-lucide="clock"></i>
+                        </div>
+                        <span class="stat-value" id="stat-time">-- Min</span>
+                        <span class="stat-desc" id="stat-time-desc">Exposición directa segura</span>
+                    </div>
+                </div>
+
+                <!-- Tarjeta del Histórico -->
+                <div class="glass-card chart-card">
+                    <div class="chart-header">
+                        <h2>Tendencia de Radiación Reciente</h2>
+                        <span class="chart-legend">Últimas 50 lecturas</span>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="uv-chart"></canvas>
+                    </div>
+                </div>
+
+            </div>
+
+        </main>
+
+    </div>
+
+    <!-- Script de control principal -->
+    <script>
+        let chart;
+        let pollInterval;
+        let isDemoMode = false;
+        let demoInterval;
+        let localHistory = [];
+
+        // Inicializar gráfico de tendencias
+        function initChart() {
+            const ctx = document.getElementById('uv-chart').getContext('2d');
+            
+            const gradientFill = ctx.createLinearGradient(0, 0, 0, 220);
+            gradientFill.addColorStop(0, 'rgba(59, 130, 246, 0.25)');
+            gradientFill.addColorStop(0.5, 'rgba(139, 92, 246, 0.08)');
+            gradientFill.addColorStop(1, 'rgba(15, 23, 42, 0)');
+            
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Índice UV',
+                        data: [],
+                        borderColor: '#3b82f6',
+                        borderWidth: 3,
+                        pointBackgroundColor: '#3b82f6',
+                        pointBorderColor: 'rgba(255, 255, 255, 0.8)',
+                        pointBorderWidth: 1.5,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        backgroundColor: gradientFill,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                            titleColor: '#fff',
+                            bodyColor: '#9ca3af',
+                            borderColor: 'rgba(255, 255, 255, 0.1)',
+                            borderWidth: 1,
+                            padding: 10,
+                            displayColors: false,
+                            callbacks: {
+                                label: function(context) {
+                                    return ` UV: ${context.parsed.y}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: {
+                                color: '#6b7280',
+                                font: { family: 'Outfit', size: 10 }
+                            }
+                        },
+                        y: {
+                            min: 0,
+                            max: 15,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.05)',
+                                drawBorder: false
+                            },
+                            ticks: {
+                                color: '#6b7280',
+                                font: { family: 'Outfit', size: 10 },
+                                stepSize: 3
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Formatear timestamps
+        function formatTime(timestampString) {
+            if (!timestampString) return '';
+            try {
+                // Si viene en formato SQLite "YYYY-MM-DD HH:MM:SS"
+                const parts = timestampString.split(' ');
+                if (parts.length === 2) {
+                    return parts[1];
+                }
+                const date = new Date(timestampString);
+                if (!isNaN(date.getTime())) {
+                    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                }
+                return timestampString;
+            } catch (e) {
+                return timestampString;
+            }
+        }
+
+        // Actualizar el medidor visual
+        function updateGauge(value) {
+            const minVal = 0;
+            const maxVal = 12;
+            const clampedVal = Math.min(Math.max(value, minVal), maxVal);
+            
+            const radius = 82;
+            const circumference = 2 * Math.PI * radius; // ~515.22
+            const offset = circumference - (clampedVal / maxVal) * circumference;
+            
+            const fill = document.getElementById('gauge-fill');
+            fill.style.strokeDashoffset = offset;
+            
+            // Definir colores y recomendaciones específicas
+            let color = 'var(--uv-low)';
+            let glow = 'rgba(16, 185, 129, 0.3)';
+            let riskText = 'Bajo';
+            let title = 'Nivel de Radiación Bajo';
+            let desc = 'La radiación UV es mínima hoy. Es seguro realizar actividades fuera de casa.';
+
+            if (value <= 2.9) {
+                color = 'var(--uv-low)';
+                glow = 'rgba(16, 185, 129, 0.3)';
+                riskText = 'Bajo';
+                title = 'Nivel de Radiación Bajo';
+                desc = 'La radiación UV es mínima hoy. Es seguro realizar actividades al aire libre.';
+            } else if (value <= 5.9) {
+                color = 'var(--uv-moderate)';
+                glow = 'rgba(245, 158, 11, 0.3)';
+                riskText = 'Moderado';
+                title = 'Riesgo de Exposición Moderado';
+                desc = 'Se recomienda precaución durante las horas centrales del día. Usa protección solar.';
+            } else if (value <= 7.9) {
+                color = 'var(--uv-high)';
+                glow = 'rgba(249, 115, 22, 0.3)';
+                riskText = 'Alto';
+                title = 'Riesgo de Exposición Alto';
+                desc = 'Es necesario usar protector solar y buscar sombra. Reduce el sol directo entre 11am y 3pm.';
+            } else if (value <= 10.9) {
+                color = 'var(--uv-veryhigh)';
+                glow = 'rgba(239, 68, 68, 0.3)';
+                riskText = 'Muy Alto';
+                title = 'Riesgo Muy Alto de Daño';
+                desc = 'Usa protección adicional de inmediato. Minimiza el tiempo bajo el sol o quédate en interiores.';
+            } else {
+                color = 'var(--uv-extreme)';
+                glow = 'rgba(168, 85, 247, 0.3)';
+                riskText = 'Extremo';
+                title = '¡Peligro! Riesgo Extremo';
+                desc = 'Trata de no salir al exterior. La piel desprotegida se puede quemar en cuestión de minutos.';
+            }
+            
+            // Actualizar variables de CSS para que el fondo de pantalla reaccione
+            document.documentElement.style.setProperty('--uv-current-color', color);
+            document.documentElement.style.setProperty('--uv-current-glow', glow);
+            
+            document.getElementById('uv-value').innerText = value.toFixed(1);
+            
+            const badge = document.getElementById('uv-risk-badge');
+            badge.innerText = riskText;
+            badge.style.backgroundColor = color;
+            badge.style.boxShadow = `0 4px 12px ${glow}`;
+            
+            document.getElementById('uv-status-title').innerText = title;
+            document.getElementById('uv-status-desc').innerText = desc;
+        }
+
+        // Actualizar tarjetas de recomendación
+        function updateRecommendations(value) {
+            const recFps = document.getElementById('rec-fps');
+            const recGlasses = document.getElementById('rec-glasses');
+            const recHat = document.getElementById('rec-hat');
+            const recShadow = document.getElementById('rec-shadow');
+            
+            const txtFps = document.getElementById('txt-fps');
+            const txtGlasses = document.getElementById('txt-glasses');
+            const txtHat = document.getElementById('txt-hat');
+            const txtShadow = document.getElementById('txt-shadow');
+            
+            // Limpiar clases activas
+            [recFps, recGlasses, recHat, recShadow].forEach(item => item.classList.remove('active'));
+            
+            if (value <= 2.9) {
+                txtFps.innerText = 'No es obligatorio. Úsalo si estás fuera por horas.';
+                txtGlasses.innerText = 'Usa lentes de sol en días soleados de alta luz.';
+                txtHat.innerText = 'Gorra opcional. Útil para actividades deportivas.';
+                txtShadow.innerText = 'No es necesario buscar sombra de forma obligatoria.';
+            } else if (value <= 5.9) {
+                recFps.classList.add('active');
+                recGlasses.classList.add('active');
+                txtFps.innerText = 'Usa protector solar con factor SPF 30+. Aplica cada 2 horas.';
+                txtGlasses.innerText = 'Lentes con protección UV400 recomendados hoy.';
+                txtHat.innerText = 'Gorra o sombrero de ala moderada para proteger cara.';
+                txtShadow.innerText = 'Intenta estar a la sombra en las horas de mayor intensidad solar.';
+            } else if (value <= 7.9) {
+                recFps.classList.add('active');
+                recGlasses.classList.add('active');
+                recHat.classList.add('active');
+                txtFps.innerText = 'Usa SPF 30 o 50 obligatoriamente. Cubre bien tu rostro.';
+                txtGlasses.innerText = 'Lentes de sol envolventes de buena calidad.';
+                txtHat.innerText = 'Sombrero de ala ancha y prendas ligeras de manga larga.';
+                txtShadow.innerText = 'Busca sombra frecuentemente. Evita el sol a mitad del día.';
+            } else if (value <= 10.9) {
+                recFps.classList.add('active');
+                recGlasses.classList.add('active');
+                recHat.classList.add('active');
+                recShadow.classList.add('active');
+                txtFps.innerText = 'Usa SPF 50+ de amplio espectro. Reaplica generosamente.';
+                txtGlasses.innerText = 'Indispensable usar lentes de sol con filtrado UV certificado.';
+                txtHat.innerText = 'Sombrero con protección solar y ropa especial manga larga (UPF).';
+                txtShadow.innerText = 'Busca sombra de forma constante. Limita la actividad al aire libre.';
+            } else {
+                recFps.classList.add('active');
+                recGlasses.classList.add('active');
+                recHat.classList.add('active');
+                recShadow.classList.add('active');
+                txtFps.innerText = 'FPS 50+ indispensable. Aplica una capa gruesa en la piel.';
+                txtGlasses.innerText = 'Gafas de sol de máxima protección oscuras al salir.';
+                txtHat.innerText = 'Cobertura completa recomendada: Sombrero, ropa UPF y sombrilla.';
+                txtShadow.innerText = '¡Peligro! Quédate bajo sombra densa o idealmente en interiores.';
+            }
+        }
+
+        // Actualizar estimación de tiempo seguro
+        function updateSafeTime(value) {
+            const timeVal = document.getElementById('stat-time');
+            const timeDesc = document.getElementById('stat-time-desc');
+            
+            if (value <= 2.9) {
+                timeVal.innerText = 'Sin Límite';
+                timeDesc.innerText = 'Exposición segura continua';
+            } else if (value <= 5.9) {
+                timeVal.innerText = '40 Min';
+                timeDesc.innerText = 'Límite seguro sin protector';
+            } else if (value <= 7.9) {
+                timeVal.innerText = '25 Min';
+                timeDesc.innerText = 'Comienzan quemaduras leves';
+            } else if (value <= 10.9) {
+                timeVal.innerText = '15 Min';
+                timeDesc.innerText = 'Quemadura rápida en piel';
+            } else {
+                timeVal.innerText = '< 10 Min';
+                timeDesc.innerText = 'Evita la exposición directa';
+            }
+        }
+
+        // Consultar la API del Backend de manera real
+        async function actualizar() {
+            if (isDemoMode) return; // Si estamos en modo simulación local, saltar llamada a la API
+            
+            try {
+                const response = await fetch('/api/uv');
+                if (!response.ok) throw new Error('API offline');
+                const data = await response.json();
+                
+                // Actualizar estado de conexión
+                const statusPill = document.getElementById('connection-status');
+                statusPill.className = 'status-pill online';
+                statusPill.querySelector('.status-text').innerText = 'CONECTADO';
+                
+                if (data && data.length > 0) {
+                    const latestVal = data[0].uv_value;
+                    
+                    // Actualizar UI
+                    updateGauge(latestVal);
+                    updateRecommendations(latestVal);
+                    updateSafeTime(latestVal);
+                    
+                    // Actualizar Gráfico
+                    const reversedData = [...data].reverse();
+                    chart.data.labels = reversedData.map(d => formatTime(d.timestamp));
+                    chart.data.datasets[0].data = reversedData.map(d => d.uv_value);
+                    chart.update();
+                    
+                    // Calcular estadísticas básicas
+                    const uvValues = data.map(d => d.uv_value);
+                    const maxUv = Math.max(...uvValues);
+                    const avgUv = (uvValues.reduce((a, b) => a + b, 0) / uvValues.length).toFixed(1);
+                    
+                    document.getElementById('stat-max').innerText = maxUv.toFixed(1);
+                    document.getElementById('stat-avg').innerText = avgUv;
+                } else {
+                    showEmptyState();
+                }
+            } catch (error) {
+                console.warn('Error al actualizar datos (Servidor desconectado):', error);
+                
+                const statusPill = document.getElementById('connection-status');
+                statusPill.className = 'status-pill offline';
+                statusPill.querySelector('.status-text').innerText = 'DESCONECTADO';
+                
+                // Si falla la conexión inicial y no hay datos, mostrar valores limpios
+                if (chart.data.datasets[0].data.length === 0) {
+                    showEmptyState();
+                }
+            }
+        }
+
+        // Mostrar estado vacío si no hay conexión o base de datos vacía
+        function showEmptyState() {
+            document.getElementById('uv-value').innerText = "0.0";
+            document.getElementById('uv-risk-badge').innerText = "Bajo";
+            document.getElementById('uv-status-title').innerText = "Sin Datos Activos";
+            document.getElementById('uv-status-desc').innerText = "El servidor está desconectado o la base de datos está vacía. ¡Activa el panel de 'Simulación' para probar el dashboard!";
+            document.getElementById('stat-max').innerText = "0.0";
+            document.getElementById('stat-avg').innerText = "0.0";
+            document.getElementById('stat-time').innerText = "-- Min";
+            document.getElementById('stat-time-desc').innerText = "Esperando lecturas de radiación";
+            updateGauge(0);
+            updateRecommendations(0);
+        }
+
+        // ==========================================
+        // SISTEMA DE SIMULACIÓN LOCAL (MODO DEMO)
+        // ==========================================
+        function toggleDemoMode() {
+            isDemoMode = !isDemoMode;
+            const btn = document.getElementById('btn-sim-mode');
+            
+            if (isDemoMode) {
+                btn.innerText = 'Detener Modo Demo';
+                btn.classList.add('active');
+                
+                // Parar polling del servidor
+                clearInterval(pollInterval);
+                
+                // Cambiar píldora de estado
+                const statusPill = document.getElementById('connection-status');
+                statusPill.className = 'status-pill online';
+                statusPill.querySelector('.status-text').innerText = 'MODO DEMO';
+                
+                // Generar historial de simulación inicial
+                localHistory = [];
+                const now = new Date();
+                for (let i = 20; i >= 0; i--) {
+                    const time = new Date(now.getTime() - i * 60 * 1000);
+                    // Curva senoidal simulando el día
+                    const factor = Math.sin((i / 20) * Math.PI);
+                    localHistory.push({
+                        uv_value: parseFloat((Math.max(0, factor * 8.5) + Math.random() * 0.4).toFixed(1)),
+                        timestamp: time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+                    });
+                }
+                
+                updateDashboardFromLocal();
+                
+                // Flujo continuo de simulación cada 3 segundos
+                demoInterval = setInterval(() => {
+                    const lastVal = localHistory[localHistory.length - 1].uv_value;
+                    let delta = (Math.random() - 0.5) * 2;
+                    let newVal = Math.max(0, Math.min(15, lastVal + delta));
+                    newVal = parseFloat(newVal.toFixed(1));
+                    
+                    addLocalReading(newVal);
+                }, 3000);
+            } else {
+                btn.innerText = 'Activar Modo Demo';
+                btn.classList.remove('active');
+                clearInterval(demoInterval);
+                
+                // Reiniciar el polling
+                actualizar();
+                pollInterval = setInterval(actualizar, 2000);
+            }
+        }
+
+        function addLocalReading(val) {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            
+            localHistory.push({ uv_value: val, timestamp: timeStr });
+            if (localHistory.length > 50) {
+                localHistory.shift();
+            }
+            
+            updateDashboardFromLocal();
+        }
+
+        function updateDashboardFromLocal() {
+            if (localHistory.length === 0) return;
+            const latest = localHistory[localHistory.length - 1];
+            
+            updateGauge(latest.uv_value);
+            updateRecommendations(latest.uv_value);
+            updateSafeTime(latest.uv_value);
+            
+            // Gráfico
+            chart.data.labels = localHistory.map(d => d.timestamp);
+            chart.data.datasets[0].data = localHistory.map(d => d.uv_value);
+            chart.update();
+            
+            // Estadísticas
+            const values = localHistory.map(d => d.uv_value);
+            const maxVal = Math.max(...values);
+            const avgVal = (values.reduce((a, b) => a + b, 0) / values.length).toFixed(1);
+            
+            document.getElementById('stat-max').innerText = maxVal.toFixed(1);
+            document.getElementById('stat-avg').innerText = avgVal;
+        }
+
+        // Eventos DOM
+        window.addEventListener('DOMContentLoaded', () => {
+            // Iniciar Chart.js
+            initChart();
+            
+            // Primera lectura y arranque de bucle de refresco
+            actualizar();
+            pollInterval = setInterval(actualizar, 2000);
+            
+            // Registrar Iconos de Lucide
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+            
+            // Toggle del panel simulador
+            const btnSimToggle = document.getElementById('toggle-sim');
+            const simPanel = document.getElementById('simulator-panel');
+            btnSimToggle.addEventListener('click', () => {
+                simPanel.classList.toggle('hidden');
+            });
+            
+            // Controles de Simulación
+            const slider = document.getElementById('sim-slider');
+            const sliderVal = document.getElementById('sim-slider-val');
+            
+            slider.addEventListener('input', (e) => {
+                const val = parseFloat(e.target.value);
+                sliderVal.innerText = val.toFixed(1);
+                
+                // Si está en modo demo o simulando, podemos mover el gauge de inmediato
+                if (isDemoMode) {
+                    updateGauge(val);
+                    updateRecommendations(val);
+                    updateSafeTime(val);
+                }
+            });
+            
+            document.getElementById('btn-sim-send').addEventListener('click', () => {
+                const val = parseFloat(slider.value);
+                // Si no está en modo demo aún, activarlo primero
+                if (!isDemoMode) {
+                    toggleDemoMode();
+                }
+                addLocalReading(val);
+            });
+            
+            document.getElementById('btn-sim-mode').addEventListener('click', toggleDemoMode);
+        });
+    </script>
+</body>
+
+</html>
