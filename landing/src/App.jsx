@@ -6,13 +6,14 @@ import {
   Sparkles, 
   Clock, 
   TrendingUp, 
+  Activity,
   Database, 
   Cpu, 
   Layers, 
   Wifi, 
   Bell, 
   ArrowRight, 
-  CheckCircle2, 
+  CheckCircle, 
   ExternalLink,
   AlertTriangle,
   Umbrella,
@@ -455,7 +456,7 @@ function App() {
 
           <div className="glass-card" style={{ marginTop: '3rem', borderLeftWidth: '4px', borderLeftColor: 'var(--color-primary)' }}>
             <h4 style={{ fontSize: '1.25rem', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <CheckCircle2 size={20} style={{ color: 'var(--color-primary)' }} />
+              <CheckCircle size={20} style={{ color: 'var(--color-primary)' }} />
               Detalle del Componente: {steps[activeStep].title}
             </h4>
             <p style={{ color: 'var(--text-secondary)' }}>
@@ -492,16 +493,16 @@ function App() {
               <h4 style={{ color: '#fff', fontSize: '1.05rem', fontWeight: '600', marginBottom: '1rem' }}>Completado y Validado</h4>
               <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                 <li style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-                  <CheckCircle2 size={16} color="#10b981" /> Envío de lecturas por MQTT al broker
+                  <CheckCircle size={16} color="#10b981" /> Envío de lecturas por MQTT al broker
                 </li>
                 <li style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-                  <CheckCircle2 size={16} color="#10b981" /> Almacenamiento histórico en SQLite3
+                  <CheckCircle size={16} color="#10b981" /> Almacenamiento histórico en SQLite3
                 </li>
                 <li style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-                  <CheckCircle2 size={16} color="#10b981" /> Despacho de alertas automatizadas a Telegram
+                  <CheckCircle size={16} color="#10b981" /> Despacho de alertas automatizadas a Telegram
                 </li>
                 <li style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-                  <CheckCircle2 size={16} color="#10b981" /> Despliegue en servidor remoto con HTTPS
+                  <CheckCircle size={16} color="#10b981" /> Despliegue en servidor remoto con HTTPS
                 </li>
               </ul>
             </div>
