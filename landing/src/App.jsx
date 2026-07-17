@@ -6,7 +6,6 @@ import {
   Sparkles, 
   Clock, 
   TrendingUp, 
-  Activity, 
   Database, 
   Cpu, 
   Layers, 
@@ -345,7 +344,7 @@ function App() {
         </div>
       </section>
 
-      {/* Features Section (Bento Grid) */}
+      {/* Features Section (Symmetric Bento Grid Layout) */}
       <section className="features-section" id="features">
         <div className="container">
           <div className="section-header">
@@ -355,9 +354,9 @@ function App() {
             </p>
           </div>
 
-          <div className="bento-grid">
+          <div className="bento-grid" style={{ gridAutoRows: '280px' }}>
             
-            {/* Tarjeta MQTT */}
+            {/* Tarjeta 1 (Fila 1 - Izquierda - Ancha): MQTT */}
             <div className="glass-card bento-card bento-cyan bento-card-large">
               <div className="bento-icon-box">
                 <Wifi size={24} />
@@ -366,8 +365,7 @@ function App() {
               <p className="bento-desc">
                 El sensor de radiación publica sus lecturas periódicamente en milisegundos mediante el protocolo de mensajería IoT Mosquitto. Esto garantiza consumo energético mínimo y respuesta instantánea.
               </p>
-              
-              <div className="bento-mqtt-nodes" style={{ maxWidth: '300px' }}>
+              <div className="bento-mqtt-nodes" style={{ maxWidth: '300px', marginTop: '1rem' }}>
                 <div className="mqtt-node">
                   <span>broker_mosquitto:1883</span>
                   <span className="badge">CONECTADO</span>
@@ -379,34 +377,32 @@ function App() {
               </div>
             </div>
 
-            {/* Tarjeta Historial SQLite */}
-            <div className="glass-card bento-card bento-card-tall">
+            {/* Tarjeta 2 (Fila 1 - Derecha - Angosta): SQLite */}
+            <div className="glass-card bento-card">
               <div className="bento-icon-box">
                 <Database size={24} />
               </div>
               <h4 className="bento-title">Base de Datos SQLite</h4>
-              <p className="bento-desc" style={{ marginBottom: '1.5rem' }}>
-                Todas las mediciones se almacenan automáticamente en una base de datos local ligera SQLite. Esto permite un análisis cronológico del comportamiento solar a lo largo de las semanas sin sobrecargar el servidor.
+              <p className="bento-desc" style={{ fontSize: '0.85rem' }}>
+                Todas las mediciones se almacenan en una base de datos local SQLite, permitiendo un análisis histórico sin sobrecargar el servidor.
               </p>
-              
-              <div className="bento-db-sim">
-                <span style={{ color: '#64748b' }}>// Ultima inserción</span><br />
+              <div className="bento-db-sim" style={{ position: 'relative', marginTop: '0.75rem', width: '100%' }}>
+                <span style={{ color: '#64748b' }}>// Registro</span><br />
                 <span style={{ color: '#10b981' }}>INSERT INTO</span> uv_data(uv_value)<br />
                 <span style={{ color: '#f59e0b' }}>VALUES</span>({(liveUv || 3.2).toFixed(1)});
               </div>
             </div>
 
-            {/* Tarjeta Gráficas */}
-            <div className="glass-card bento-card bento-orange bento-card-tall">
+            {/* Tarjeta 3 (Fila 2 - Izquierda - Angosta): Charts */}
+            <div className="glass-card bento-card bento-orange">
               <div className="bento-icon-box">
                 <TrendingUp size={24} />
               </div>
               <h4 className="bento-title">Gráficos de Tendencia</h4>
-              <p className="bento-desc">
-                Visualiza el aumento y disminución de la radiación a lo largo de las horas. El dashboard interactivo expone gráficas dinámicas de la radiación con escalas cromáticas basadas en la OMS.
+              <p className="bento-desc" style={{ fontSize: '0.85rem' }}>
+                El dashboard interactivo expone gráficas dinámicas de la radiación con escalas cromáticas basadas en la OMS.
               </p>
-              
-              <div className="bento-chart-mini">
+              <div className="bento-chart-mini" style={{ position: 'relative', height: '60px', marginTop: '1rem' }}>
                 <div className="bento-chart-bar" style={{ height: '35%' }}></div>
                 <div className="bento-chart-bar" style={{ height: '55%' }}></div>
                 <div className="bento-chart-bar" style={{ height: '80%' }}></div>
@@ -417,14 +413,14 @@ function App() {
               </div>
             </div>
 
-            {/* Tarjeta Telegram bot */}
+            {/* Tarjeta 4 (Fila 2 - Derecha - Ancha): Telegram */}
             <div className="glass-card bento-card bento-card-large">
               <div className="bento-icon-box">
                 <Bell size={24} />
               </div>
               <h4 className="bento-title">Notificaciones Inteligentes Telegram</h4>
               <p className="bento-desc">
-                El bot analiza los cambios rápidos en la radiación solar y te advierte si de repente es necesario reaplicar filtro solar o buscar sombra, enviando reportes a un canal exclusivo de manera automática.
+                El bot analiza los cambios rápidos en la radiación solar y te advierte si de repente es necesario reaplicar filtro solar o buscar sombra, enviando reportes a un canal exclusivo de manera automática para mantenerte a salvo en todo momento.
               </p>
             </div>
 
